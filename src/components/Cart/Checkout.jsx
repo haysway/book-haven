@@ -47,7 +47,14 @@ const Checkout = (props) => {
         if (!formIsValid) {
             return;
         }
-        // TODO: Submit cart and customer data to Firebase backend
+        
+        // Pass validated customer details to parent submit handler
+        props.onConfirm({
+            name: enteredName,
+            address: enteredAddress,
+            city: enteredCity,
+            postal: enteredPostal,
+        });
     };
 
     const nameControlClasses = `${classes.control} ${
