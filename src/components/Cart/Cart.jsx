@@ -6,6 +6,8 @@ import CartItem from './CartItem';
 import Checkout from './Checkout';
 
 const Cart = (props) => {
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [didSubmit, setDidSubmit] = useState(false);
     const [isCheckout, setIsCheckout] = useState(false);
     const cartCtx = useContext(CartContext);
 
@@ -24,8 +26,10 @@ const Cart = (props) => {
         setIsCheckout(true);
     };
 
-    const submitOrderHandler = (userData) => {
-        fetch(
+    const submitOrderHandler = async (userData) => {
+        setIsSubmitting(true);
+
+        await fetch(
             'https://book-haven-app-28f0e-default-rtdb.firebaseio.com/orders.json',
             {
                 method: 'POST',
@@ -38,6 +42,10 @@ const Cart = (props) => {
                 }),
             }
         );
+
+        setIsSubmitting(false);
+        setDidSubmit(true);
+        cartCtx.clearCart();
     };
 
     const cartItems = (
@@ -69,8 +77,8 @@ const Cart = (props) => {
         </div>
     );
 
-    return (
-        <Modal onClose={props.onCloseCart}>
+    const cartModalContent = (
+        <>
             {cartItems}
             <div className={classes.total}>
                 <span>Total Amount</span>
@@ -84,6 +92,27 @@ const Cart = (props) => {
                 />
             )}
             {!isCheckout && modalActions}
+        </>
+    );
+
+    const isSubmittingModalContent = <p>Sending order data...</p>;
+
+    const didSubmitModalContent = (
+        <>
+            <p>Successfully sent the order!</p>
+            <div className={classes.actions}>
+                <button className={classes.button} onClick={props.onCloseCart}>
+                    Close
+                </button>
+            </div>
+        </>
+    );
+
+    return (
+        <Modal onClose={props.onCloseCart}>
+            {!isSubmitting && !didSubmit && cartModalContent}
+            {isSubmitting && isSubmittingModalContent}
+            {!isSubmitting && didSubmit && didSubmitModalContent}
         </Modal>
     );
 };
