@@ -1,4 +1,5 @@
 import classes from './BookItem.module.css';
+import BookItemForm from './BookItemForm';
 
 const BookItem = (props) => {
     const price = `$${props.price.toFixed(2)}`;
@@ -12,7 +13,7 @@ const BookItem = (props) => {
             </div>
 
             <div>
-                {/* TODO: Add quantity selection form */}
+                <BookItemForm id={props.id} />
             </div>
         </li>
     );
