@@ -1,9 +1,10 @@
 import './App.css';
+import Header from './components/Layout/Header';
 
 function App() {
   return (
     <div>
-    <h2>Book Haven Setup</h2>
+      <Header />
     </div>
   );
 }
