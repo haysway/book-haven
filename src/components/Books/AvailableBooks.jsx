@@ -1,36 +1,65 @@
+import { useEffect, useState } from 'react';
 import classes from './AvailableBooks.module.css';
 import Card from '../UI/Card';
 import BookItem from './book-item/BookItem';
 
-const DUMMY_BOOKS = [
-    {
-        id: 'b1',
-        name: 'The Great Gatsby',
-        description: 'A classic novel set in the Roaring Twenties.',
-        price: 14.99,
-    },
-    {
-        id: 'b2',
-        name: 'To Kill a Mockingbird',
-        description: 'A deeply moving story about justice and morality.',
-        price: 12.50,
-    },
-    {
-        id: 'b3',
-        name: '1984',
-        description: 'A compelling dystopian masterpiece.',
-        price: 10.99,
-    },
-    {
-        id: 'b4',
-        name: 'Pride and Prejudice',
-        description: 'A timeless romantic comedy of manners.',
-        price: 15.99,
-    },
-];
-
 const AvailableBooks = () => {
-    const booksList = DUMMY_BOOKS.map((book) => (
+    const [books, setBooks] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [httpError, setHttpError] = useState();
+
+    useEffect(() => {
+        const fetchBooks = async () => {
+            try {
+                const response = await fetch(
+                    'https://book-haven-app-28f0e-default-rtdb.firebaseio.com/books.json'
+                );
+
+                if (!response.ok) {
+                    throw new Error('Failed to load books. Please try again later.');
+                }
+
+                const responseData = await response.json();
+
+                const loadedBooks = [];
+
+                for (const key in responseData) {
+                    loadedBooks.push({
+                        id: key,
+                        name: responseData[key].name,
+                        description: responseData[key].description,
+                        price: responseData[key].price,
+                    });
+                }
+
+                setBooks(loadedBooks);
+                setIsLoading(false);
+            } catch (error) {
+                setIsLoading(false);
+                setHttpError(error.message);
+            }
+        };
+
+        fetchBooks();
+    }, []);
+
+    if (isLoading) {
+        return (
+            <section className={classes.BooksLoading}>
+            <   p>Loading books...</p>
+            </section>
+        );
+    }
+
+    if (httpError) {
+        return (
+            <section className={classes.BooksError}>
+                <p>{httpError}</p>
+            </section>
+        );
+    }
+
+    const booksList = books.map((book) => (
         <BookItem
             id={book.id}
             key={book.id}
